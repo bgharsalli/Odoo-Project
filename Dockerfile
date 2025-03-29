@@ -1,6 +1,9 @@
 # Utilisation de l'image officielle Odoo 17.0 comme base
 FROM odoo:17.0
 
+# Passer en utilisateur root pour éviter les problèmes de permission
+USER root
+
 # Installer les dépendances système nécessaires pour python-ldap et d'autres modules
 RUN apt-get update && apt-get install -y \
     libldap2-dev \
