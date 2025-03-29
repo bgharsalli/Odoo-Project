@@ -10,13 +10,11 @@ ENV ODOO_VERSION=17.0 \
 # Passer à l'utilisateur root pour installer les dépendances nécessaires
 USER root
 
-# Ajouter directement le dépôt PostgreSQL pour Ubuntu Jammy (22.04)
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ jammy-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
-    curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
-    apt-get update
-
-# Mise à jour du système et installation des dépendances
-RUN apt-get install -y \
+# Installer les dépendances système nécessaires pour python-ldap et d'autres modules
+RUN apt-get update && apt-get install -y \
+    libldap2-dev \
+    libsasl2-dev \
+    lsb-release \
     git \
     wget \
     python3-pip \
@@ -24,6 +22,11 @@ RUN apt-get install -y \
     build-essential \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
+
+# Ajouter le dépôt PostgreSQL
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ jammy-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    apt-get update
 
 # Création du répertoire des modules personnalisés et donner les droits nécessaires
 RUN mkdir -p $ODOO_CUSTOM_ADDONS && chown -R $ODOO_USER:$ODOO_USER $ODOO_CUSTOM_ADDONS
