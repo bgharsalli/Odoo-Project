@@ -10,8 +10,13 @@ ENV ODOO_VERSION=17.0 \
 # Passer à l'utilisateur root pour installer les dépendances nécessaires
 USER root
 
+# Ajouter le dépôt PostgreSQL si nécessaire
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -c | awk '{print $2}')-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    apt-get update
+
 # Mise à jour du système et installation des dépendances
-RUN apt-get update && apt-get install -y \
+RUN apt-get install -y \
     git \
     wget \
     python3-pip \
