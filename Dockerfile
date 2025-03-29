@@ -1,10 +1,7 @@
-# Utilisation de l'image officielle Odoo 17.0 comme base
+# Utiliser l'image officielle d'Odoo 17.0 comme base
 FROM odoo:17.0
 
-# Passer en utilisateur root pour éviter les problèmes de permission
-USER root
-
-# Installer les dépendances système nécessaires pour python-ldap et d'autres modules
+# Installer les dépendances nécessaires pour python-ldap et autres modules
 RUN apt-get update && apt-get install -y \
     libldap2-dev \
     libsasl2-dev \
@@ -12,19 +9,27 @@ RUN apt-get update && apt-get install -y \
     git \
     wget \
     python3-pip \
-    libpq-dev=14.17-0ubuntu0.22.04.1 \
     build-essential \
     python3-dev \
+    && apt-get install -f \
     && rm -rf /var/lib/apt/lists/*
 
-# Installer les dépendances Python
-RUN pip3 install -r requirements.txt
+# Installer les dépendances de PostgreSQL avec une version spécifique
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copier le fichier de configuration Odoo
+# Copier les fichiers de configuration et les addons personnalisés
 COPY config/odoo.conf /etc/odoo/
 
 # Exposer le port 8069 pour l'accès web à Odoo
 EXPOSE 8069
 
-# Démarrer le serveur Odoo
+# Définir le répertoire de travail pour Odoo
+WORKDIR /opt/odoo
+
+# Installer les dépendances Python d'Odoo
+RUN pip3 install -r /opt/odoo/requirements.txt
+
+# Commande par défaut pour exécuter Odoo
 CMD ["odoo"]
