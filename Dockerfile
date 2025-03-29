@@ -27,11 +27,12 @@ RUN git clone --depth 1 --branch $ODOO_VERSION https://github.com/odoo/odoo.git 
 # Installation des dépendances Python requises
 RUN pip3 install -r requirements.txt
 
-# Définition du fichier de configuration Odoo
-COPY odoo.conf /etc/odoo/odoo.conf
+# Définition du fichier de configuration Odoo (avec correction du chemin)
+COPY config/odoo.conf /etc/odoo/odoo.conf
 
 # Exposition des ports pour Odoo
 EXPOSE 8069 8072
 
 # Commande de lancement d'Odoo
 CMD ["odoo", "--config=/etc/odoo/odoo.conf"]
+
