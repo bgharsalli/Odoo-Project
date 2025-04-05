@@ -1,45 +1,53 @@
 pipeline {
-    agent any
+    agent {
+        node {
+            label 'agentodoo'
+        }
+    }
 
     environment {
-        SONARQUBE_URL = 'SonarQube'
-        GIT_REPO = 'https://github.com/bgharsalli/Odoo-Project.git'
+        // Utiliser le socket Docker via WSL2
+        DOCKER_HOST = "unix:///var/run/docker.sock"
+        SONARQUBE_URL = 'http://localhost:9000'  // URL de SonarQube
+        SONARQUBE_TOKEN = 'sqp_02e6dca32122de734f422571b3bd9737285e2937'  // Ton token SonarQube
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: "${GIT_REPO}"
+                git branch: 'main', url: 'https://github.com/bgharsalli/Odoo-Project.git'
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    bat 'sonar-scanner'
-                }
+                bat '''
+                sonar-scanner ^
+                    -Dsonar.projectKey=Odooprojet ^
+                    -Dsonar.sources=. ^
+                    -Dsonar.host.url=${SONARQUBE_URL} ^
+                    -Dsonar.token=${SONARQUBE_TOKEN}
+                '''
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Docker Build') {
             steps {
-                script {
-                    def tag = "odoo_custom-${env.BUILD_ID}"
-                    bat "docker build -t ${tag} ."
-                }
+                bat 'docker build -t odoo_project_image .'
             }
         }
 
         stage('Deploy Odoo + PostgreSQL') {
             steps {
-                bat 'docker-compose up -d'
+                bat 'docker-compose up -d' // Déploiement avec Docker Compose
             }
         }
 
         stage('Database Migration') {
             steps {
+                // Remplace "odoo_app" par le nom réel du conteneur Odoo que tu utilises.
                 script {
-                    def containerName = 'odoo_app'  // Assurez-vous que c'est le bon nom de conteneur
+                    def containerName = 'odoo_app'  // Assurez-vous que c'est le bon nom de conteneur Odoo
                     bat "docker exec -it ${containerName} odoo -u all -d odoo --stop-after-init"
                 }
             }
@@ -47,6 +55,7 @@ pipeline {
 
         stage('Check Odoo Logs') {
             steps {
+                // Remplace "odoo_app" par le nom réel du conteneur Odoo que tu utilises.
                 bat 'docker logs odoo_app'
             }
         }
