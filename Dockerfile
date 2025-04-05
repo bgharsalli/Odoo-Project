@@ -29,16 +29,6 @@ RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /
     apt-get update && \
     apt-get install -y docker-ce-cli docker-compose
 
-# ---- Jenkins ----
-RUN useradd -m -d /home/jenkins jenkins && \
-    mkdir -p /var/jenkins_home && \
-    chown -R jenkins:jenkins /var/jenkins_home
-
-ENV JENKINS_HOME=/var/jenkins_home
-
-# Installer Jenkins (CLI ou war si tu veux l'interface web)
-RUN curl -o /opt/jenkins.war https://get.jenkins.io/war-stable/2.426.1/jenkins.war
-
 # ---- SonarScanner ----
 ENV SONAR_SCANNER_VERSION=5.0.1.3006
 RUN curl -sL -o sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip && \
