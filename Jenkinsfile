@@ -25,7 +25,7 @@ pipeline {
             steps {
                 script {
                     def tag = "odoo_custom-${env.BUILD_ID}"
-                    sh "docker build -t ${tag} ."
+                    bat "docker build -t ${tag} ."
                 }
             }
         }
