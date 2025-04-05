@@ -16,7 +16,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh 'sonar-scanner'
+                    bat 'sonar-scanner'
                 }
             }
         }
@@ -32,7 +32,7 @@ pipeline {
 
         stage('Deploy Odoo + PostgreSQL') {
             steps {
-                sh 'docker-compose up -d'
+                bat 'docker-compose up -d'
             }
         }
 
@@ -40,14 +40,14 @@ pipeline {
             steps {
                 script {
                     def containerName = 'odoo_app'  // Assurez-vous que c'est le bon nom de conteneur
-                    sh "docker exec -it ${containerName} odoo -u all -d odoo --stop-after-init"
+                    bat "docker exec -it ${containerName} odoo -u all -d odoo --stop-after-init"
                 }
             }
         }
 
         stage('Check Odoo Logs') {
             steps {
-                sh 'docker logs odoo_app'
+                bat 'docker logs odoo_app'
             }
         }
 
