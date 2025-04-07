@@ -21,7 +21,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                bat '''
+                sh '''
                 sonar-scanner ^
                     -Dsonar.projectKey=Odooprojet ^
                     -Dsonar.sources=. ^
@@ -33,13 +33,13 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                bat 'docker build -t odoo_project_image .'
+                sh 'docker build -t odoo_project_image .'
             }
         }
 
         stage('Deploy Odoo + PostgreSQL') {
             steps {
-                bat 'docker-compose up -d' // Déploiement avec Docker Compose
+                sh 'docker-compose up -d' // Déploiement avec Docker Compose
             }
         }
 
@@ -48,7 +48,7 @@ pipeline {
                 // Remplace "odoo_app" par le nom réel du conteneur Odoo que tu utilises.
                 script {
                     def containerName = 'odoo_app'  // Assurez-vous que c'est le bon nom de conteneur Odoo
-                    bat "docker exec -it ${containerName} odoo -u all -d odoo --stop-after-init"
+                    sh "docker exec -it ${containerName} odoo -u all -d odoo --stop-after-init"
                 }
             }
         }
@@ -56,7 +56,7 @@ pipeline {
         stage('Check Odoo Logs') {
             steps {
                 // Remplace "odoo_app" par le nom réel du conteneur Odoo que tu utilises.
-                bat 'docker logs odoo_app'
+                sh 'docker logs odoo_app'
             }
         }
 
